@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>CDL PRO Enrollment Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: a reviewer's note strip above an exact replica of the live enroll.cdlpro.net card.
+     Deliberately single (light) look: it reproduces a real page that has no dark mode. */
+  :root {
+    color-scheme: light;
+    --accent: #2563eb;
+    --bg: #f4f6f9;
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #dde3ea;
+    --note-bg: #fff8e6;
+    --note-border: #ecd9a4;
+    --note-text: #5b4710;
+    --ok: #15803d;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.5;
+    padding-block: 24px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Reviewer note (for Juan, not part of the real page) */
+  .note {
+    background: var(--note-bg);
+    border: 1px dashed var(--note-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--note-text);
+    font-size: 0.88rem;
+  }
+  .note strong { color: var(--note-text); }
+  .note p { margin: 0; }
+  .note .steps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .note .steps button {
+    font: inherit; font-size: 0.78rem; font-weight: 600;
+    background: transparent; color: var(--note-text);
+    border: 1px solid var(--note-border); border-radius: 6px;
+    padding: 4px 10px; cursor: pointer;
+  }
+  .note .steps button[aria-current="true"] { background: var(--note-text); color: var(--note-bg); border-color: var(--note-text); }
+  .note .steps button:disabled { opacity: 0.45; cursor: default; }
+  .note .screen-note { margin-top: 10px; }
+
+  /* Replica of the live checkout card */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+  }
+  .lang-toggle { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+  .lang-toggle .options { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .lang-toggle button {
+    font: inherit; padding: 6px 12px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em;
+    color: var(--muted); background: var(--card-bg); border: 0; cursor: pointer;
+  }
+  .lang-toggle button[aria-current="true"] { background: var(--accent); color: #ffffff; }
+  h1 { font-size: 1.5rem; margin: 0 0 8px; text-wrap: balance; }
+  .headline { color: var(--muted); font-size: 1rem; margin: 0 0 20px; }
+  .progress { color: var(--muted); font-size: 0.8rem; margin: 0 0 6px; font-weight: 600; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .choice {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: start;
+    border: 1px solid var(--border); border-radius: 8px; padding: 14px; cursor: pointer;
+  }
+  .choice:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .choice input { margin: 4px 0 0; accent-color: var(--accent); }
+  .choice .name { font-weight: 600; min-width: 0; }
+  .choice .price { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .choice .detail { grid-column: 2 / 4; color: var(--muted); font-size: 0.85rem; min-width: 0; }
+  .choice .math { grid-column: 2 / 4; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+  .choice .math b { color: var(--accent); }
+  .group-label { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin: 6px 0 -2px; }
+
+  .summary {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px; margin-bottom: 20px; font-size: 0.92rem;
+  }
+  .summary table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .summary td { padding: 2px 0; }
+  .summary td:last-child { text-align: right; white-space: nowrap; }
+  .summary tr.total td { border-top: 1px solid var(--border); padding-top: 8px; font-weight: 700; }
+  .summary tr.total td:last-child { color: var(--accent); font-size: 1.15rem; }
+  .summary .after { margin-top: 8px; color: var(--muted); font-size: 0.85rem; }
+
+  form { display: flex; flex-direction: column; gap: 14px; }
+  label.field { font-size: 0.85rem; font-weight: 600; display: flex; flex-direction: column; gap: 4px; }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="date"] {
+    width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 1rem; font-weight: 400;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fin-note { font-size: 0.82rem; color: var(--muted); margin: -4px 0 0; }
+  .ack {
+    display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 0.9rem; cursor: pointer;
+  }
+  .ack input { margin: 3px 0 0; accent-color: var(--accent); width: 18px; height: 18px; }
+  .btn {
+    background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 14px;
+    font: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%;
+  }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn:focus-visible, .link:focus-visible, .choice:focus-within, .ack:focus-within, .note button:focus-visible, .lang-toggle button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  .link { background: none; border: 0; color: var(--muted); font: inherit; font-size: 0.88rem; cursor: pointer; padding: 6px 0; text-decoration: underline; align-self: flex-start; }
+  .nav { display: flex; flex-direction: column; gap: 6px; }
+  .refund-policy { margin-top: 24px; font-size: 0.8rem; color: var(--muted); }
+
+  .provider-frame {
+    border: 1px dashed var(--muted); border-radius: 8px; padding: 20px; text-align: center;
+    color: var(--muted); font-size: 0.9rem; margin-bottom: 20px;
+  }
+  .provider-frame strong { display: block; color: var(--text); font-size: 1rem; margin-bottom: 6px; }
+  .done-mark { color: var(--ok); font-weight: 700; font-size: 0.85rem; margin: 0 0 6px; }
+  ol.next { margin: 0 0 20px; padding-left: 20px; font-size: 0.93rem; display: flex; flex-direction: column; gap: 6px; }
+
+  @media (max-width: 480px) {
+    .card { padding: 20px; }
+    .row2 { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <section class="note" aria-label="Nota para revisar">
+    <p><strong>Maqueta de enroll.cdlpro.net, versión 1.</strong> Así lo vería un alumno. Tocá las opciones como si fueras uno: no cobra nada ni guarda datos. Los precios salen de lo que hoy responde el asistente de chat. Es una maqueta: lo que ves es la propuesta, todavía no está en enroll.cdlpro.net.</p>
+    <div class="steps" id="steps"></div>
+    <p class="screen-note" id="screenNote"></p>
+  </section>
+
+  <main class="card" id="card" aria-live="polite"></main>
+</div>
+
+<script>
+(() => {
+  const PROGRAMS = [
+    { id: 'classA', group: 'course', price: 3500, deposit: true,
+      en: ['Class A (Manual or Automatic)', '18 driving hours. Includes study materials, ELDT course, 3 exam attempts and the road test at the school.'],
+      es: ['Clase A (manual o automática)', '18 horas de manejo. Incluye materiales de estudio, curso ELDT, 3 intentos de examen y el examen de manejo en la escuela.'] },
+    { id: 'classB', group: 'course', price: 3200, deposit: true,
+      en: ['Class B (Manual or Automatic)', '14 driving hours. Includes study materials, ELDT course, 3 exam attempts and the road test at the school.'],
+      es: ['Clase B (manual o automática)', '14 horas de manejo. Incluye materiales de estudio, curso ELDT, 3 intentos de examen y el examen de manejo en la escuela.'] },
+    { id: 'upgrade', group: 'course', price: 2500, deposit: true,
+      en: ['Class B to Class A Upgrade', 'Includes study materials, ELDT course, truck training, 2 exam attempts and the road test at the school.'],
+      es: ['Mejora de Clase B a Clase A', 'Incluye materiales de estudio, curso ELDT, entrenamiento en camión, 2 intentos de examen y el examen de manejo en la escuela.'] },
+    { id: 'restriction', group: 'course', price: 1500, deposit: true,
+      en: ['Automatic Transmission Restriction Removal', '8 driving hours on combination vehicles. Includes truck training, 2 exam attempts and the road test at the school.'],
+      es: ['Remoción de la restricción de transmisión automática', '8 horas de manejo en vehículos combinados. Incluye entrenamiento en camión, 2 intentos de examen y el examen de manejo en la escuela.'] },
+    { id: 'hazmat', group: 'endorse', price: 200, deposit: false,
+      en: ['Hazmat endorsement', 'Online, no in-person training. Includes study materials, ELDT and appointment scheduling.'],
+      es: ['Endoso Hazmat', 'En línea, sin entrenamiento presencial. Incluye materiales de estudio, ELDT y agendamiento de citas.'] },
+    { id: 'hazmatTanker', group: 'endorse', price: 250, deposit: false,
+      en: ['Hazmat plus Tanker endorsements', 'Online, no in-person training. Includes study materials, ELDT and appointment scheduling.'],
+      es: ['Endosos Hazmat y Tanker', 'En línea, sin entrenamiento presencial. Incluye materiales de estudio, ELDT y agendamiento de citas.'] },
+    { id: 'rent1', group: 'rental', price: 500, deposit: false,
+      en: ['Truck rental for the road test, 1 attempt', 'For drivers trained elsewhere. Truck and one exam attempt, no training. Non-refundable.'],
+      es: ['Renta de camión para el examen, 1 intento', 'Para quien ya entrenó en otro lugar. Camión y un intento de examen, sin entrenamiento. No reembolsable.'] },
+    { id: 'rent2', group: 'rental', price: 750, deposit: false,
+      en: ['Truck rental for the road test, 2 attempts', 'For drivers trained elsewhere. Truck and two exam attempts, no training. Non-refundable.'],
+      es: ['Renta de camión para el examen, 2 intentos', 'Para quien ya entrenó en otro lugar. Camión y dos intentos de examen, sin entrenamiento. No reembolsable.'] },
+  ];
+  const DEPOSIT = 500;
+  const FEE_RATE = 0.029;
+  const fee = n => Math.round(n * FEE_RATE * 100) / 100;
+  const money = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const money0 = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+
+  const NOTES = {
+    1: 'Paso 1, nuevo. Hoy la página muestra solamente "$514.50" y no dice qué se está comprando. Ahora el alumno primero elige el programa y ve el precio completo.',
+    2: 'Paso 2, nuevo. El alumno elige cómo pagar y ve cada monto en dólares: la tarifa de tarjeta del 2.9% aparece ya calculada. Los endosos y la renta de camión solo se pagan completos; las cuotas con Denefits aparecen solo para los cursos.',
+    3: 'Paso 3. Los mismos datos de hoy, más una casilla obligatoria que dice qué está pagando y cuánto le queda. Si elige cuotas, pedimos dirección, código postal y fecha de nacimiento porque Denefits los exige; la fecha de nacimiento no la guardamos.',
+    4: 'Paso 4. Depósito o pago completo: la misma página de pago de bPayd que hoy. Cuotas: la página de Denefits, donde el alumno elige el plan y carga licencia, SSN y tarjeta. Nosotros nunca vemos esos datos.',
+    5: 'Paso 5. La confirmación repite qué pagó y cuánto le falta. Ustedes reciben el mismo email y SMS de hoy, ahora con el programa y la forma de pago, y el alumno sigue a la solicitud de PowerSuite.',
+  };
+
+  const T = {
+    title:        ['CDL PRO - Enrollment', 'CDL PRO - Inscripción'],
+    s1Head:       ['Choose your program', 'Elige tu programa'],
+    courses:      ['CDL courses', 'Cursos de CDL'],
+    endorsements: ['Endorsements', 'Endosos'],
+    rentals:      ['Already trained', 'Ya entrenaste'],
+    continue:     ['Continue', 'Continuar'],
+    back:         ['Back', 'Volver'],
+    step:         (n) => [`Step ${n} of 3`, `Paso ${n} de 3`],
+    s2Head:       ['How would you like to pay?', '¿Cómo quieres pagar?'],
+    optDeposit:   ['Pay a deposit', 'Pagar un depósito'],
+    optDepositD:  (rest) => [`Reserves your seat. The remaining ${money0(rest)} is due before yard training begins.`, `Reserva tu lugar. Los ${money0(rest)} restantes se pagan antes de empezar el entrenamiento en el patio.`],
+    optFull:      ['Pay in full', 'Pagar completo'],
+    optFullD:     ['Nothing else to pay for this program.', 'No tienes nada más que pagar por este programa.'],
+    optFin:       ['Monthly payments', 'Pagos mensuales'],
+    optFinD:      ['12 to 48 monthly payments through Denefits, our financing partner. You see the down payment and monthly amount before you agree to anything.', 'De 12 a 48 pagos mensuales con Denefits, nuestro socio de financiamiento. Ves el pago inicial y la cuota mensual antes de aceptar nada.'],
+    cardFee:      ['card fee', 'tarifa de tarjeta'],
+    today:        ['today', 'hoy'],
+    s3Head:       ['Your details', 'Tus datos'],
+    program:      ['Program', 'Programa'],
+    depositL:     ['Deposit', 'Depósito'],
+    fullL:        ['Program price', 'Precio del programa'],
+    feeL:         ['Card processing fee (2.9%)', 'Tarifa por pago con tarjeta (2.9%)'],
+    payToday:     ['You pay today', 'Pagas hoy'],
+    afterDep:     (p, rest) => [`Program price ${money0(p)}. After this deposit you owe ${money0(rest)}, due before yard training begins.`, `Precio del programa ${money0(p)}. Después de este depósito debes ${money0(rest)}, a pagar antes de empezar el entrenamiento en el patio.`],
+    afterFull:    ['Paid in full. Nothing else is owed for this program.', 'Pagado completo. No debes nada más por este programa.'],
+    finSum:       (p) => [`Financed amount: ${money0(p)}. Denefits shows your down payment, monthly payment and any fees on the next page.`, `Monto a financiar: ${money0(p)}. Denefits te muestra el pago inicial, la cuota mensual y cualquier cargo en la siguiente página.`],
+    name:         ['Full name', 'Nombre completo'],
+    email:        ['Email address', 'Correo electrónico'],
+    phone:        ['Phone number', 'Número de teléfono'],
+    address:      ['Street address', 'Dirección'],
+    zip:          ['ZIP code', 'Código postal'],
+    dob:          ['Date of birth', 'Fecha de nacimiento'],
+    finNote:      ['Denefits needs these to set up your plan. We send them to Denefits and do not keep your date of birth.', 'Denefits los necesita para armar tu plan. Se los enviamos a Denefits y no guardamos tu fecha de nacimiento.'],
+    ackDep:       (name, p, total, rest) => [`I understand ${money(total)} is a deposit toward ${name} (${money0(p)}), not the full price. The remaining ${money0(rest)} is due before yard training begins.`, `Entiendo que ${money(total)} es un depósito para ${name} (${money0(p)}), no el precio completo. Los ${money0(rest)} restantes se pagan antes de empezar el entrenamiento en el patio.`],
+    ackFull:      (name, total) => [`I understand I am paying the full price of ${name}: ${money(total)}, card fee included.`, `Entiendo que estoy pagando el precio completo de ${name}: ${money(total)}, con la tarifa de tarjeta incluida.`],
+    ackRental:    (name, total) => [`I understand I am paying ${money(total)} for ${name}, with no training included, and that truck rentals are non-refundable.`, `Entiendo que estoy pagando ${money(total)} por ${name}, sin entrenamiento incluido, y que la renta de camión no es reembolsable.`],
+    ackFin:       (name, p) => [`I understand I am applying for a payment plan with Denefits, a separate company, for ${name} (${money0(p)}).`, `Entiendo que estoy solicitando un plan de pagos con Denefits, una empresa separada, para ${name} (${money0(p)}).`],
+    btnDep:       (t) => [`Pay deposit — ${money(t)}`, `Pagar depósito — ${money(t)}`],
+    btnFull:      (t) => [`Pay in full — ${money(t)}`, `Pagar completo — ${money(t)}`],
+    btnFin:       ['Continue to Denefits', 'Continuar a Denefits'],
+    refund:       ['Refund policy: Full refund if you request it within 72 hours of payment. After 72 hours, your deposit is refunded minus an administrative fee. Once classes have started, refunds are partial, pro-rated to your unused sessions. Truck rentals are non-refundable. Refunds are processed by CDL PRO - contact the school to request one.',
+                   'Política de reembolso: Reembolso completo si lo solicitas dentro de las 72 horas posteriores al pago. Después de 72 horas, tu depósito se reembolsa menos una tarifa administrativa. Una vez que las clases han comenzado, los reembolsos son parciales y prorrateados según tus sesiones no utilizadas. La renta de camión no es reembolsable. Los reembolsos son procesados por CDL PRO - comunícate con la escuela para solicitarlo.'],
+    bpaydTitle:   ['Secure card payment page', 'Página segura de pago con tarjeta'],
+    bpaydBody:    (t) => [`The same bPayd payment page used today, for ${money(t)}.`, `La misma página de pago de bPayd que se usa hoy, por ${money(t)}.`],
+    denTitle:     ['Denefits payment plan page', 'Página del plan de pagos de Denefits'],
+    denBody:      ['The student picks 12 to 48 months, sees the down payment and monthly amount, and enters driver license, SSN and card on Denefits\' own page.', 'El alumno elige de 12 a 48 meses, ve el pago inicial y la cuota mensual, y carga licencia, SSN y tarjeta en la página de Denefits.'],
+    simulate:     ['Simulate a completed payment', 'Simular un pago completado'],
+    doneDep:      ['Deposit received', 'Depósito recibido'],
+    doneFull:     ['Payment received', 'Pago recibido'],
+    doneFin:      ['Payment plan approved', 'Plan de pagos aprobado'],
+    doneHead:     (name) => [`You're enrolling in ${name}`, `Te estás inscribiendo en ${name}`],
+    doneDepB:     (t, rest) => [`We received your ${money(t)} deposit. You owe ${money0(rest)}, due before yard training begins.`, `Recibimos tu depósito de ${money(t)}. Debes ${money0(rest)}, a pagar antes de empezar el entrenamiento en el patio.`],
+    doneFullB:    (t) => [`We received ${money(t)}. Nothing else is owed for this program.`, `Recibimos ${money(t)}. No debes nada más por este programa.`],
+    doneFinB:     ['Denefits approved your plan and will email you the payment schedule. Your first payment was charged by Denefits.', 'Denefits aprobó tu plan y te enviará por correo el calendario de pagos. Denefits ya cobró tu primer pago.'],
+    nextTitle:    ['What happens next', 'Qué sigue'],
+    next1:        ['Complete your CDL PRO application (next button).', 'Completa tu solicitud de CDL PRO (siguiente botón).'],
+    next2:        ['We email you a receipt with these details.', 'Te enviamos por correo un recibo con estos datos.'],
+    next3:        ['The CDL PRO team calls you to schedule your first session.', 'El equipo de CDL PRO te llama para agendar tu primera sesión.'],
+    toApp:        ['Continue to the CDL PRO application', 'Continuar a la solicitud de CDL PRO'],
+    restart:      ['Start the mockup again', 'Empezar la maqueta de nuevo'],
+  };
+
+  const S = { lang: 'en', step: 1, program: 'classA', option: null, ack: false, form: {} };
+  const tr = (v) => (Array.isArray(v) ? v : [v, v])[S.lang === 'es' ? 1 : 0];
+  const prog = () => PROGRAMS.find(p => p.id === S.program);
+  const pname = () => prog()[S.lang][0];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function optionsFor(p) {
+    const list = [];
+    if (p.deposit) list.push('deposit');
+    list.push('full');
+    if (p.group === 'course') list.push('finance');
+    return list;
+  }
+  function amounts() {
+    const p = prog();
+    if (S.option === 'deposit') return { base: DEPOSIT, fee: fee(DEPOSIT), total: DEPOSIT + fee(DEPOSIT), rest: p.price - DEPOSIT };
+    if (S.option === 'full') return { base: p.price, fee: fee(p.price), total: p.price + fee(p.price), rest: 0 };
+    return { base: p.price, fee: 0, total: 0, rest: 0 };
+  }
+
+  function langToggle() {
+    return `<nav class="lang-toggle" aria-label="Language"><div class="options">
+      <button type="button" data-lang="en" ${S.lang === 'en' ? 'aria-current="true"' : ''}>EN</button>
+      <button type="button" data-lang="es" ${S.lang === 'es' ? 'aria-current="true"' : ''}>ES</button>
+    </div></nav>`;
+  }
+
+  function screen1() {
+    const row = p => `<label class="choice">
+        <input type="radio" name="program" id="prog-${p.id}" value="${p.id}" ${S.program === p.id ? 'checked' : ''}>
+        <span class="name">${esc(p[S.lang][0])}</span><span class="price">${money0(p.price)}</span>
+        <span class="detail">${esc(p[S.lang][1])}</span>
+      </label>`;
+    return `${langToggle()}
+      <p class="progress">${tr(T.step(1))}</p>
+      <h1>${tr(T.title)}</h1>
+      <p class="headline">${tr(T.s1Head)}</p>
+      <div class="choices" role="radiogroup">
+        <div class="group-label">${tr(T.courses)}</div>
+        ${PROGRAMS.filter(p => p.group === 'course').map(row).join('')}
+        <div class="group-label">${tr(T.endorsements)}</div>
+        ${PROGRAMS.filter(p => p.group === 'endorse').map(row).join('')}
+        <div class="group-label">${tr(T.rentals)}</div>
+        ${PROGRAMS.filter(p => p.group === 'rental').map(row).join('')}
+      </div>
+      <button class="btn" type="button" data-go="2">${tr(T.continue)}</button>`;
+  }
+
+  function screen2() {
+    const p = prog();
+    const opts = optionsFor(p);
+    if (!opts.includes(S.option)) S.option = opts[0];
+    const card = o => {
+      if (o === 'deposit') {
+        const f = fee(DEPOSIT);
+        return `<label class="choice"><input type="radio" name="opt" id="opt-deposit" value="deposit" ${S.option === o ? 'checked' : ''}>
+          <span class="name">${tr(T.optDeposit)}</span><span class="price">${money(DEPOSIT + f)}</span>
+          <span class="math">${money0(DEPOSIT)} + ${money(f)} ${tr(T.cardFee)} = <b>${money(DEPOSIT + f)}</b> ${tr(T.today)}</span>
+          <span class="detail">${tr(T.optDepositD(p.price - DEPOSIT))}</span></label>`;
+      }
+      if (o === 'full') {
+        const f = fee(p.price);
+        return `<label class="choice"><input type="radio" name="opt" id="opt-full" value="full" ${S.option === o ? 'checked' : ''}>
+          <span class="name">${tr(T.optFull)}</span><span class="price">${money(p.price + f)}</span>
+          <span class="math">${money0(p.price)} + ${money(f)} ${tr(T.cardFee)} = <b>${money(p.price + f)}</b> ${tr(T.today)}</span>
+          <span class="detail">${tr(T.optFullD)}</span></label>`;
+      }
+      return `<label class="choice"><input type="radio" name="opt" id="opt-finance" value="finance" ${S.option === o ? 'checked' : ''}>
+        <span class="name">${tr(T.optFin)}</span><span class="price"></span>
+        <span class="detail">${tr(T.optFinD)}</span></label>`;
+    };
+    return `${langToggle()}
+      <p class="progress">${tr(T.step(2))}</p>
+      <h1>${esc(pname())}</h1>
+      <p class="headline">${tr(T.s2Head)}</p>
+      <div class="choices" role="radiogroup">${opts.map(card).join('')}</div>
+      <div class="nav">
+        <button class="btn" type="button" data-go="3">${tr(T.continue)}</button>
+        <button class="link" type="button" data-go="1">${tr(T.back)}</button>
+      </div>`;
+  }
+
+  function ackText() {
+    const p = prog(), a = amounts(), n = pname();
+    if (S.option === 'finance') return tr(T.ackFin(n, p.price));
+    if (S.option === 'deposit') return tr(T.ackDep(n, p.price, a.total, a.rest));
+    if (p.group === 'rental') return tr(T.ackRental(n, a.total));
+    return tr(T.ackFull(n, a.total));
+  }
+
+  function screen3() {
+    const p = prog(), a = amounts(), fin = S.option === 'finance';
+    const f = S.form;
+    const summary = fin
+      ? `<table><tr><td>${tr(T.program)}: ${esc(pname())}</td><td>${money0(p.price)}</td></tr></table>
+         <p class="after">${tr(T.finSum(p.price))}</p>`
+      : `<table>
+          <tr><td>${S.option === 'deposit' ? tr(T.depositL) : tr(T.fullL)}</td><td>${money(a.base)}</td></tr>
+          <tr><td>${tr(T.feeL)}</td><td>${money(a.fee)}</td></tr>
+          <tr class="total"><td>${tr(T.payToday)}</td><td>${money(a.total)}</td></tr>
+        </table>
+        <p class="after">${S.option === 'deposit' ? tr(T.afterDep(p.price, a.rest)) : tr(T.afterFull)}</p>`;
+    const btn = fin ? tr(T.btnFin) : (S.option === 'deposit' ? tr(T.btnDep(a.total)) : tr(T.btnFull(a.total)));
+    return `${langToggle()}
+      <p class="progress">${tr(T.step(3))}</p>
+      <h1>${esc(pname())}</h1>
+      <p class="headline">${tr(T.s3Head)}</p>
+      <div class="summary">${summary}</div>
+      <form id="details" novalidate>
+        <label class="field">${tr(T.name)}<input type="text" id="f-name" value="${esc(f.name || '')}" autocomplete="name"></label>
+        <label class="field">${tr(T.email)}<input type="email" id="f-email" value="${esc(f.email || '')}" autocomplete="email"></label>
+        <label class="field">${tr(T.phone)}<input type="tel" id="f-phone" value="${esc(f.phone || '')}" autocomplete="tel"></label>
+        ${fin ? `
+          <label class="field">${tr(T.address)}<input type="text" id="f-address" value="${esc(f.address || '')}" autocomplete="street-address"></label>
+          <div class="row2">
+            <label class="field">${tr(T.zip)}<input type="text" id="f-zip" inputmode="numeric" maxlength="5" value="${esc(f.zip || '')}" autocomplete="postal-code"></label>
+            <label class="field">${tr(T.dob)}<input type="date" id="f-dob" value="${esc(f.dob || '')}"></label>
+          </div>
+          <p class="fin-note">${tr(T.finNote)}</p>` : ''}
+        <label class="ack"><input type="checkbox" id="f-ack" ${S.ack ? 'checked' : ''}><span>${esc(ackText())}</span></label>
+        <button class="btn" type="submit" id="payBtn" ${S.ack ? '' : 'disabled'}>${btn}</button>
+        <button class="link" type="button" data-go="2">${tr(T.back)}</button>
+      </form>
+      <p class="refund-policy">${tr(T.refund)}</p>`;
+  }
+
+  function screen4() {
+    const fin = S.option === 'finance', a = amounts();
+    return `${langToggle()}
+      <div class="provider-frame">
+        <strong>${fin ? tr(T.denTitle) : tr(T.bpaydTitle)}</strong>
+        ${fin ? tr(T.denBody) : tr(T.bpaydBody(a.total))}
+      </div>
+      <div class="nav">
+        <button class="btn" type="button" data-go="5">${tr(T.simulate)}</button>
+        <button class="link" type="button" data-go="3">${tr(T.back)}</button>
+      </div>`;
+  }
+
+  function screen5() {
+    const a = amounts(), o = S.option;
+    const mark = o === 'finance' ? tr(T.doneFin) : (o === 'deposit' ? tr(T.doneDep) : tr(T.doneFull));
+    const body = o === 'finance' ? tr(T.doneFinB) : (o === 'deposit' ? tr(T.doneDepB(a.total, a.rest)) : tr(T.doneFullB(a.total)));
+    return `${langToggle()}
+      <p class="done-mark">${mark}</p>
+      <h1>${esc(tr(T.doneHead(pname())))}</h1>
+      <p class="headline">${body}</p>
+      <p class="progress">${tr(T.nextTitle)}</p>
+      <ol class="next"><li>${tr(T.next1)}</li><li>${tr(T.next2)}</li><li>${tr(T.next3)}</li></ol>
+      <div class="nav">
+        <button class="btn" type="button" disabled>${tr(T.toApp)}</button>
+        <button class="link" type="button" data-restart>${tr(T.restart)}</button>
+      </div>`;
+  }
+
+  const SCREENS = { 1: screen1, 2: screen2, 3: screen3, 4: screen4, 5: screen5 };
+  const STEP_LABELS = ['1 · Programa', '2 · Forma de pago', '3 · Datos', '4 · Pago', '5 · Confirmación'];
+
+  function render(focus) {
+    if (S.step > 1 && !optionsFor(prog()).includes(S.option)) S.option = optionsFor(prog())[0];
+    document.getElementById('card').innerHTML = SCREENS[S.step]();
+    document.getElementById('screenNote').textContent = NOTES[S.step];
+    document.getElementById('steps').innerHTML = STEP_LABELS.map((l, i) =>
+      `<button type="button" data-jump="${i + 1}" ${S.step === i + 1 ? 'aria-current="true"' : ''}>${l}</button>`).join('');
+    if (focus) document.getElementById('card').scrollIntoView({ block: 'nearest' });
+  }
+
+  function saveForm() {
+    ['name', 'email', 'phone', 'address', 'zip', 'dob'].forEach(k => {
+      const el = document.getElementById('f-' + k);
+      if (el) S.form[k] = el.value;
+    });
+  }
+
+  document.addEventListener('click', e => {
+    const t = e.target.closest('button');
+    if (!t) return;
+    if (t.dataset.lang) { saveForm(); S.lang = t.dataset.lang; render(); return; }
+    if (t.dataset.restart !== undefined) { S.step = 1; S.option = null; S.ack = false; S.form = {}; render(true); return; }
+    const go = t.dataset.go || t.dataset.jump;
+    if (go) { saveForm(); if (+go <= 3 || S.step >= 3 || t.dataset.jump) S.step = +go; render(true); }
+  });
+  document.addEventListener('change', e => {
+    if (e.target.name === 'program') { S.program = e.target.value; S.option = null; S.ack = false; }
+    if (e.target.name === 'opt') { S.option = e.target.value; S.ack = false; }
+    if (e.target.id === 'f-ack') { S.ack = e.target.checked; document.getElementById('payBtn').disabled = !S.ack; }
+  });
+  document.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!S.ack) return;
+    saveForm(); S.step = 4; render(true);
+  });
+
+  S.option = null;
+  render();
+})();
+</script>
+</body>
+</html>
